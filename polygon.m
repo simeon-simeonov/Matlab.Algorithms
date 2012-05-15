@@ -1,5 +1,5 @@
 function y = polygon(x)
-
+xx = x;
 N = size(x,1); % Number of points
 idx = zeros(N, 1); % ind contains the indices of the sorted coordinates
 
@@ -10,6 +10,22 @@ if(size(a,1) > 1)
     a = a(i(1));
 end
 
+x_1 = x(find(x(:,2)==x(a,2)),:); % find all x with the same y coordinate
+x_2 = x(find(x(:,1)==x(a,1)),:); % find all x with the same x coordinate
+
+if(size(x_1,1) > 1 || size(x_2,1) > 1)
+    x_1 = sort(x_1);
+    x_2 = sort(x_2, 'descend');
+    
+    x_1 = x_1(2:size(x_1,1),:);
+    x_2 = x_2(1:size(x_2,1)-1,:);
+    
+    x_not = [x_2; x_1];
+    
+    x = setdiff(x, x_not, 'rows');
+    N = size(x,1);
+    a = 1;
+end
 d = x - repmat(x(a,:), N, 1);
 th = d(:,2)./(d(:,1) + d(:,2));
 
@@ -30,4 +46,4 @@ for ri = r'
     idx(idx==idx_repeated) = find(th==th(idx_sorted(ri)));
 end
 
-y = [x(idx,:); x(a,:)];
+y = [x(1,:); x_1; x(idx(2:size(idx,1)),:); x_2; x(1,:)];
