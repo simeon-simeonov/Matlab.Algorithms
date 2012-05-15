@@ -1,26 +1,33 @@
 function y = polygon(x)
 
 N = size(x,1); % Number of points
-ind = zeros(N, 1); % ind contains the indices of the sorted coordinates
+idx = zeros(N, 1); % ind contains the indices of the sorted coordinates
 
-% a contains the index(ices) of the starting point(s) - the point(s) with
-% min y coordinate(s). A special case is that several points might have the
-% same min y coordinate(s). If this happens we want to choose the point
-% with min x coordinate amongst them.
 a = find(x(:,2)==min(x(:,2)));
 
-% Sort the points with min y coordinate wrt increasing x coordinate. This
-% allows us to have the starting point at the index 1 in the b matrix and
-% the rest of b contains the first few points of the polygon.
-[~, i] = sort(x(a,1));
-ind(1:size(a,1)) = a(i);
+if(size(a,1) > 1)
+    [v i] = sort(x(a,1));
+    a = i(1);
+end
 
-d = x - repmat(x(ind(1),:), N, 1);
+d = x - repmat(x(a,:), N, 1);
 th = d(:,2)./(d(:,1) + d(:,2));
 
-t = [sort(th(th>0)); sort(th(th<0))];
-[~, i] = ismember(t, th);
-ind = [ind(ind~=0); i];
+[v0 idx0] = ismember(sort(th(th==0)), th);
+[v1 idx1] = ismember(sort(th(th>0)), th);
+[v2 idx2] = ismember(sort(th(th<0)), th);
 
-y = x(ind,:);
-y(N+1, :) = y(1,:);
+idx = [a; idx0; idx1; idx2];
+% I contains the indices of idx in a sorted order. [v i] = sort(idx) then
+% i==I.
+[~,I,J]= unique(idx);
+R = histc(J, 1:size(I,1)); % R(1) will always be 1?
+
+idx_sorted = idx(I);
+r = find(R>1);
+for ri = r'
+    idx_repeated = idx_sorted(ri);
+    idx(idx==idx_repeated) = find(th==th(idx_sorted(ri)));
+end
+
+y = [x(idx,:); x(a,:)];
