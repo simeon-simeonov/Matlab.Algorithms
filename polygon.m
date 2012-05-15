@@ -7,7 +7,7 @@ a = find(x(:,2)==min(x(:,2)));
 
 if(size(a,1) > 1)
     [v i] = sort(x(a,1));
-    a = i(1);
+    a = a(i(1));
 end
 
 d = x - repmat(x(a,:), N, 1);
