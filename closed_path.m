@@ -22,7 +22,7 @@
 
 %% Author: Simeon Simeonov <simeon.simeonov.s@gmail.com>
 
-function y = closedpath(x)
+function y = closed_path(x)
 
 if(size(x,1) > 1 && size(x,1) < size(x,2))
     x = x';
