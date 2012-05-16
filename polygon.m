@@ -41,7 +41,12 @@ if(size(a,1) > 1)
 end
 
 x_1 = x(x(:,2)==x(a,2),:); % find all x with the same y coordinate
-x_2 = x(x(:,1)==x(a,1),:); % find all x with the same x coordinate
+
+if(x(a,1) == min(x(:,1)))
+    x_2 = x(x(:,1)==x(a,1),:); % find all x with the same x coordinate
+else
+   x_2 = x(a,:);
+end
 
 if(size(x_1,1) > 1 || size(x_2,1) > 1)
     if(size(x_1,1) > 1)
@@ -62,7 +67,7 @@ if(size(x_1,1) > 1 || size(x_2,1) > 1)
     a = 1;
 else
     x_1 = [];
-    x_2 = [];
+    x_2 = x(a,:);
 end
 d = x - repmat(x(a,:), N, 1);
 th = d(:,2)./(d(:,1) + d(:,2));
