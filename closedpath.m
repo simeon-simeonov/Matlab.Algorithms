@@ -22,7 +22,7 @@
 
 %% Author: Simeon Simeonov <simeon.simeonov.s@gmail.com>
 
-function y = polygon(x)
+function y = closedpath(x)
 
 if(size(x,1) > 1 && size(x,1) < size(x,2))
     x = x';
