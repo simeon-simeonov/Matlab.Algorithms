@@ -22,8 +22,6 @@
 
 %% Author: Simeon Simeonov <simeon.simeonov.s@gmail.com>
 
-%% Note: Last I was working on 6.mat
-
 function y = polygon(x)
 
 if(size(x,1) > 1 && size(x,1) < size(x,2))
