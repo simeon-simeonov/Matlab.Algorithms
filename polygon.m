@@ -12,53 +12,77 @@
 %%
 %% You should have received a copy of the GNU General Public License
 %% along with this program; if not, see <http://www.gnu.org/licenses/>.
+%%
+%% -*- texinfo -*-
+%% @deftypefn {Function File} {@var{y} =} polygon (@var{x})
+%% Returns a simple closed path that passes through all the points in x.
+%% x is a vector containing 2D coordinates of the points.
+%%
+%% @end deftypefn
+
+%% Author: Simeon Simeonov <simeon.simeonov.s@gmail.com>
+
+%% Note: Last I was working on 6.mat
 
 function y = polygon(x)
-xx = x;
+
+if(size(x,1) > 1 && size(x,1) < size(x,2))
+    x = x';
+end
+
 N = size(x,1); % Number of points
 idx = zeros(N, 1); % ind contains the indices of the sorted coordinates
 
 a = find(x(:,2)==min(x(:,2)));
 
 if(size(a,1) > 1)
-    [v i] = sort(x(a,1));
+    [~, i] = sort(x(a,1));
     a = a(i(1));
 end
 
-x_1 = x(find(x(:,2)==x(a,2)),:); % find all x with the same y coordinate
-x_2 = x(find(x(:,1)==x(a,1)),:); % find all x with the same x coordinate
+x_1 = x(x(:,2)==x(a,2),:); % find all x with the same y coordinate
+x_2 = x(x(:,1)==x(a,1),:); % find all x with the same x coordinate
 
 if(size(x_1,1) > 1 || size(x_2,1) > 1)
-    x_1 = sort(x_1);
-    x_2 = sort(x_2, 'descend');
+    if(size(x_1,1) > 1)
+        x_1 = sort(x_1); % Sort by x coordinate
+        y(1,:) = x(a,:); % original starting point
+    end
     
-    x_1 = x_1(2:size(x_1,1),:);
-    x_2 = x_2(1:size(x_2,1)-1,:);
+    if (size(x_2,1) > 1)
+        x_2 = sort(x_2, 'descend');
+    end
     
-    x_not = [x_2; x_1];
-    
-    x = setdiff(x, x_not, 'rows');
+    x_not = [x_1; x_2];
+    i = ismember(x,x_not,'rows');
+    x(i, :) = [];
+    x = [x_1(size(x_1,1),:); x];
+    x_1(size(x_1, 1),:) = [];
     N = size(x,1);
     a = 1;
+else
+    x_1 = [];
+    x_2 = [];
 end
 d = x - repmat(x(a,:), N, 1);
 th = d(:,2)./(d(:,1) + d(:,2));
 
-[v0 idx0] = ismember(sort(th(th==0)), th);
-[v1 idx1] = ismember(sort(th(th>0)), th);
-[v2 idx2] = ismember(sort(th(th<0)), th);
+[~, idx0] = ismember(sort(th(th==0)), th);
+[~, idx1] = ismember(sort(th(th>0)), th);
+[~, idx2] = ismember(sort(th(th<0)), th);
 
 idx = [a; idx0; idx1; idx2];
 % I contains the indices of idx in a sorted order. [v i] = sort(idx) then
 % i==I.
 [~,I,J]= unique(idx);
-R = histc(J, 1:size(I,1)); % R(1) will always be 1?
-
-idx_sorted = idx(I);
-r = find(R>1);
-for ri = r'
-    idx_repeated = idx_sorted(ri);
-    idx(idx==idx_repeated) = find(th==th(idx_sorted(ri)));
+if(size(I,1) ~= size(J,1))
+    R = histc(J, 1:size(I,1)); % R(1) will always be 1?
+    idx_sorted = idx(I);
+    r = find(R>1);
+    for ri = r'
+        idx_repeated = idx_sorted(ri);
+        idx(idx==idx_repeated) = find(th==th(idx_sorted(ri)));
+    end
 end
 
-y = [x(1,:); x_1; x(idx(2:size(idx,1)),:); x_2; x(1,:)];
+y = [x_1; x(idx,:); x_2;];
