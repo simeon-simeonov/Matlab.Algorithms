@@ -31,17 +31,30 @@ end
 N = size(x,1); % Number of points
 idx = zeros(N, 1); % ind contains the indices of the sorted coordinates
 
+% Find the index of the point(s) with min y coordinate
 a = find(x(:,2)==min(x(:,2)));
 
+% In case there are more than one point with the same min y coordinate,
+% sort these points by their x coordinate and let a be the index of
+% the point with min y and min x coordinate.
 if(size(a,1) > 1)
     [~, i] = sort(x(a,1));
     a = a(i(1));
 end
 
-x_1 = x(x(:,2)==x(a,2),:); % find all x with the same y coordinate
+% -- Section 1 --
 
+% This code deals with points that are on the same horizontal or vertical line
+% as the starting point.
+
+% find all points with the same y coordinate as the starting point x(a,:)
+x_1 = x(x(:,2)==x(a,2),:);
+
+% If the starting point happens to also be the point with the smallest x coordinate
+% then find all other points which have the same x coordinate. Otherwise set x_2 to
+% the starting point.
 if(x(a,1) == min(x(:,1)))
-    x_2 = x(x(:,1)==x(a,1),:); % find all x with the same x coordinate
+    x_2 = x(x(:,1)==x(a,1),:);
 else
    x_2 = x(a,:);
 end
@@ -49,7 +62,6 @@ end
 if(size(x_1,1) > 1 || size(x_2,1) > 1)
     if(size(x_1,1) > 1)
         x_1 = sort(x_1); % Sort by x coordinate
-        y(1,:) = x(a,:); % original starting point
     end
     
     if (size(x_2,1) > 1)
@@ -67,6 +79,9 @@ else
     x_1 = [];
     x_2 = x(a,:);
 end
+
+% -- Section 1 --
+
 d = x - repmat(x(a,:), N, 1);
 th = d(:,2)./(d(:,1) + d(:,2));
 
@@ -88,4 +103,4 @@ if(size(I,1) ~= size(J,1))
     end
 end
 
-y = [x_1; x(idx,:); x_2;];
+y = [x_1; x(idx,:); x_2];
