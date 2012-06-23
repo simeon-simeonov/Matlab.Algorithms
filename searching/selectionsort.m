@@ -10,13 +10,15 @@ maxX = max(x);
 len = length(x);
 
 for j = 1:length(x) - 1
+    idxMin = j;
     for i = j+1:length(x)       
-        if(x(i) < x(j))
-            tmp = x(j);
-            x(j) = x(i);
-            x(i) = tmp;
+        if(x(i) < x(idxMin))
+            idxMin = i;
         end
     end
+    tmp = x(idxMin);
+    x(idxMin) = x(j);
+    x(j) = tmp;
     
     % The code below is purely for plotting.
     hold off;
